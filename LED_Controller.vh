@@ -23,13 +23,13 @@ begin
                 if position = "1111" then
                     position <= "0000"; -- Wrap to the rightmost LED
                 else
-                    position <= position + 1; -- Move left
+                    position <= std_logic_vector(unsigned(position) + 1); -- Move left
                 end if;
             elsif btn_right = '1' then
                 if position = "0000" then
                     position <= "1111"; -- Wrap to the leftmost LED
                 else
-                    position <= position - 1; -- Move right
+                    position <= std_logic_vector(unsigned(position) - 1); -- Move right
                 end if;
             end if;
         end if;
