@@ -1,8 +1,7 @@
 -- Testbench for LED Controller
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity tb_LED_Controller is
 end tb_LED_Controller;

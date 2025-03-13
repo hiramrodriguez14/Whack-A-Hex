@@ -1,8 +1,7 @@
 -- LED Controller Module
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity LED_Controller is
     Port (
@@ -37,6 +36,14 @@ begin
     end process;
     
     pos_out <= position;
-    led_out <= (OTHERS => '0');
-    led_out(to_integer(unsigned(position))) <= '1';
+    
+    process(position)
+        variable index : INTEGER;
+    begin
+        led_out <= (OTHERS => '0'); -- Reset all LEDs
+        index := to_integer(unsigned(position)); -- Convert position to integer
+        if index >= 0 and index < 16 then
+            led_out(index) <= '1'; -- Activate the correct LED
+        end if;
+    end process;
 end Behavioral;
