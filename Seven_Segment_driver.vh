@@ -5,7 +5,9 @@ use IEEE.NUMERIC_STD.ALL;
 entity Seven_Segment_Driver is
     Port (
         clk   : in STD_LOGIC;
-        hex1, hex2, hex3, hex4 : in STD_LOGIC_VECTOR(3 downto 0);
+        timer_left, timer_right : in STD_LOGIC_VECTOR(3 downto 0);
+        random_hex : in STD_LOGIC_VECTOR(3 downto 0);
+        lives : in STD_LOGIC_VECTOR(1 downto 0);
         seg   : out STD_LOGIC_VECTOR(6 downto 0);
         an    : out STD_LOGIC_VECTOR(3 downto 0)
     );
@@ -24,6 +26,18 @@ architecture Behavioral of Seven_Segment_Driver is
         );
     end component;
 
+    -- Function to display lives as horizontal segments
+    function lives_to_7seg(lives: STD_LOGIC_VECTOR(1 downto 0)) return STD_LOGIC_VECTOR is
+    begin
+        case lives is
+            when "00" => return "1111111"; -- No lives (Display off)
+            when "01" => return "1000001"; -- 1 life (Bottom segment on)
+            when "10" => return "1001001"; -- 2 lives (Middle & Bottom segments on)
+            when "11" => return "0001001"; -- 3 lives (Top, Middle & Bottom on)
+            when others => return "1111111"; -- Default off
+        end case;
+    end lives_to_7seg;
+
 begin
     -- Instantiate Decoder
     Decoder_Inst : Seven_Segment_Decoder port map (hex_in => current_digit, seg_out => seg_out);
@@ -36,15 +50,15 @@ begin
         end if;
     end process;
 
-    -- Select which digit to display
+    -- Select which value to display
     with digit_select select
-        current_digit <= hex1 when "00",
-                         hex2 when "01",
-                         hex3 when "10",
-                         hex4 when "11";
+        current_digit <= timer_left when "00",
+                         timer_right when "01",
+                         lives when "10",
+                         random_hex when "11";
 
-    -- Assign decoder output to seg
-    seg <= seg_out;
+    -- Convert lives separately since it's a special format
+    seg <= lives_to_7seg(lives) when digit_select = "10" else seg_out;
 
     -- Activate the corresponding digit
     an <= "1110" when digit_select = "00" else

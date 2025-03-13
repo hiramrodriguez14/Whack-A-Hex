@@ -29,7 +29,7 @@ begin
             when "1101" => seg_out <= "0100001"; -- D
             when "1110" => seg_out <= "0000110"; -- E
             when "1111" => seg_out <= "0001110"; -- F
-            when others => seg_out <= "1111111";  -- Default off
+            when others => seg_out <= "1111111";  -- Default: all segments off
         end case;
     end process;
 end Behavioral;
