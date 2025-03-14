@@ -25,10 +25,10 @@ begin
         btn_out => btn_out
     );
 
-    -- Clock process
+    -- Clock process (10ns period, 100MHz)
     process
     begin
-        while now < 500 ms loop
+        while now < 1000 ms loop
             clk <= '0';
             wait for 5 ns;
             clk <= '1';
@@ -37,29 +37,29 @@ begin
         wait;
     end process;
 
-    -- Test process (Simulating button bouncing)
+    -- Test process (Simulating button bouncing and stabilization)
     process
     begin
         -- No button press
         btn_in <= '0';
-        wait for 100 ns;
+        wait for 200 ns;
 
         -- Simulating a bouncing press
         btn_in <= '1'; wait for 10 ns;
         btn_in <= '0'; wait for 10 ns;
         btn_in <= '1'; wait for 10 ns;
         btn_in <= '0'; wait for 10 ns;
-        btn_in <= '1'; wait for 100 ns; -- Finally stabilizes high
+        btn_in <= '1'; wait for 250 ns; -- Finally stabilizes high (> 20 cycles)
 
         -- Holding the button press
-        wait for 200 ns;
+        wait for 300 ns;
 
         -- Simulating a bouncing release
         btn_in <= '0'; wait for 10 ns;
         btn_in <= '1'; wait for 10 ns;
         btn_in <= '0'; wait for 10 ns;
         btn_in <= '1'; wait for 10 ns;
-        btn_in <= '0'; wait for 100 ns; -- Finally stabilizes low
+        btn_in <= '0'; wait for 250 ns; -- Finally stabilizes low (> 20 cycles)
 
         wait;
     end process;
