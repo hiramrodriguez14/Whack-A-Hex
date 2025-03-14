@@ -12,6 +12,7 @@ end Debouncer;
 
 architecture Behavioral of Debouncer is
     signal shift_reg : STD_LOGIC_VECTOR(19 downto 0) := (others => '0'); -- Shift register for debouncing
+    signal btn_out_reg : STD_LOGIC := '0'; -- Ensure initialization
 begin
     process(clk)
     begin
@@ -21,10 +22,12 @@ begin
             
             -- Button is stable if all bits are the same
             if shift_reg = "11111111111111111111" then
-                btn_out <= '1';
+                btn_out_reg <= '1';
             elsif shift_reg = "00000000000000000000" then
-                btn_out <= '0';
+                btn_out_reg <= '0';
             end if;
         end if;
     end process;
+    
+    btn_out <= btn_out_reg; -- Assign registered output
 end Behavioral;
