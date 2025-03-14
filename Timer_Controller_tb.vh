@@ -6,21 +6,24 @@ entity tb_Timer_Controller is
 end tb_Timer_Controller;
 
 architecture testbench of tb_Timer_Controller is
+    -- Test signals
     signal clk           : STD_LOGIC := '0';
     signal reset         : STD_LOGIC := '0';
     signal paused        : STD_LOGIC := '0';
-    signal current_score : STD_LOGIC_VECTOR(7 downto 0) := "00000000"; -- Start at score 0
+    signal current_score : STD_LOGIC_VECTOR(13 downto 0) := "00000000000000"; -- Score = 0
     signal timer_out     : STD_LOGIC_VECTOR(7 downto 0);
 
+    -- Component declaration
     component Timer_Controller
         Port (
             clk           : in STD_LOGIC;
             reset         : in STD_LOGIC;
             paused        : in STD_LOGIC;
-            current_score : in STD_LOGIC_VECTOR(7 downto 0);
+            current_score : in STD_LOGIC_VECTOR(13 downto 0);
             timer_out     : out STD_LOGIC_VECTOR(7 downto 0)
         );
     end component;
+
 begin
     -- Instantiate Timer Controller
     UUT: Timer_Controller port map (
@@ -31,7 +34,7 @@ begin
         timer_out => timer_out
     );
 
-    -- Clock process
+    -- Clock process (50 MHz -> 20 ns period)
     process
     begin
         while now < 500 ms loop
@@ -46,32 +49,34 @@ begin
     -- Test process
     process
     begin
-        -- Reset timer
+        -- **1️⃣ Reset Timer and Check Initialization**
         reset <= '1';
         wait for 50 ns;
         reset <= '0';
 
-        -- Let timer run normally for 5 seconds
-        wait for 5 sec;
+        -- **2️⃣ Let Timer Run for a Few Seconds**
+        wait for 2 sec;  -- Timer should decrement normally
 
-        -- Increase score gradually
-        current_score <= "00000101"; -- Score = 5
-        wait for 5 sec;
-        current_score <= "00001010"; -- Score = 10
-        wait for 5 sec;
-        current_score <= "00001111"; -- Score = 15
-        wait for 5 sec;
-        current_score <= "00010010"; -- Score = 18
-        wait for 5 sec;
-        current_score <= "00100000"; -- Score = 32 (Max Speed)
-
-        -- Pause for 3 seconds
+        -- **3️⃣ Pause Timer and Ensure It Stops Counting**
         paused <= '1';
-        wait for 3 sec;
+        wait for 2 sec;  -- Timer should NOT decrement
         paused <= '0';
 
-        -- Let timer reach 0
-        wait for 20 sec;
+        -- **4️⃣ Test Speed Increase Based on Score**
+        current_score <= "00000000000101"; -- Score = 5
+        wait for 2 sec;  -- Timer should decrement slightly faster
+
+        current_score <= "00000000001000"; -- Score = 10
+        wait for 2 sec;  -- Timer should decrement even faster
+
+        current_score <= "00000000010000"; -- Score = 16
+        wait for 2 sec;  -- Timer should be even faster
+
+        -- **5️⃣ Reset Timer and Verify it Goes Back to 99**
+        reset <= '1';
+        wait for 50 ns;
+        reset <= '0';
+        wait for 2 sec;
 
         wait;
     end process;
