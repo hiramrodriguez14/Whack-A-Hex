@@ -4,57 +4,43 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity Timer_Controller is
     Port (
-        clk       : in STD_LOGIC;  -- 50MHz clock
-        reset     : in STD_LOGIC;  -- Resets timer to 99
-        paused    : in STD_LOGIC;  -- Pause signal (1 = paused, 0 = running)
-        current_score : in STD_LOGIC_VECTOR(13 downto 0); -- Score affects speed
-        timer_out : out STD_LOGIC_VECTOR(7 downto 0) -- Timer value (99 to 00)
+        clk1Hz       : in STD_LOGIC;  -- ✅ Clock de 1Hz para contar el tiempo
+        clk100MHz    : in STD_LOGIC;  -- ✅ Clock principal (100MHz)
+        clkDynamic   : in STD_LOGIC;  -- ✅ Clock dinámico (acelera con score)
+        reset        : in STD_LOGIC;  -- ✅ Resetea el timer a 30
+        state        : in STD_LOGIC_VECTOR(2 downto 0); -- ✅ Estado FSM
+        timer_out    : out STD_LOGIC_VECTOR(4 downto 0) -- ✅ Timer (30 a 00)
     );
 end Timer_Controller;
 
 architecture Behavioral of Timer_Controller is
-    signal timer : UNSIGNED(7 downto 0) := "10011001"; -- 99 in binary
-    signal tick_counter : UNSIGNED(25 downto 0) := (others => '0'); -- 26-bit for clock division
-    signal speed_factor : UNSIGNED(25 downto 0);
-
-    -- Base and Max speed values (adjust for faster speeds)
-    constant BASE_SPEED : UNSIGNED(25 downto 0) := X"2FAF080"; -- 50M cycles ≈ 1 sec
-    constant MAX_SPEED  : UNSIGNED(25 downto 0) := X"0F4240";  -- ~1/5 sec (faster mode)
+    signal timer : UNSIGNED(4 downto 0) := "11110"; -- ✅ 30 en binario
 
 begin
-    -- Adjust timer speed based on score
-    process(current_score)
+    -- ✅ Manejo del Timer según el Estado del Juego
+    process(clk100MHz)
     begin
-        case current_score is
-            when "00000000000000" to "00000000000100" => speed_factor <= BASE_SPEED; -- Normal speed
-            when "00000000000101" to "00000000001000" => speed_factor <= BASE_SPEED - X"400000"; 
-            when "00000000001001" to "00000000010000" => speed_factor <= BASE_SPEED - X"800000"; 
-            when "00000000010001" to "00000000011111" => speed_factor <= BASE_SPEED - X"C00000"; 
-            when others => speed_factor <= MAX_SPEED; -- Fastest countdown
-        end case;
-    end process;
-
-    -- Timer countdown process
-    process(clk)
-    begin
-        if rising_edge(clk) then
+        if rising_edge(clk100MHz) then
             if reset = '1' then
-                timer <= "10011001"; -- Reset to 99
-                tick_counter <= (others => '0');
-            elsif paused = '0' then  -- Only count down when not paused
-                tick_counter <= tick_counter + 1;
+                timer <= "11110"; -- ✅ Resetear a 30
 
-                if tick_counter >= speed_factor then
-                    tick_counter <= (others => '0');
-
+            elsif state = "011" or state = "101" then  -- ✅ HIGH_SCORE o CURRENT_SCORE
+                if rising_edge(clk1Hz) then
                     if timer > 0 then
-                        timer <= timer - 1; -- Decrement timer
+                        timer <= timer - 1;
+                    end if;
+                end if;
+
+            elsif state = "010" then  -- ✅ PLAY MODE (Usa clkDynamic para velocidad variable)
+                if rising_edge(clkDynamic) then
+                    if timer > 0 then
+                        timer <= timer - 1;
                     end if;
                 end if;
             end if;
         end if;
     end process;
 
-    -- Assign output
+
     timer_out <= STD_LOGIC_VECTOR(timer);
 end Behavioral;

@@ -1,25 +1,33 @@
--- Random Hexadecimal Generator Module
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
-entity Random_Hex_Generator is
+entity Random_Hex_Generator is 
     Port (
-        clk : in STD_LOGIC;
-        rand_hex : out STD_LOGIC_VECTOR(3 downto 0)
+        clk       : in  STD_LOGIC; -- 100 MHz clock
+        btn_center : in  STD_LOGIC;
+        rand_hex  : out STD_LOGIC_VECTOR(3 downto 0)
     );
 end Random_Hex_Generator;
 
 architecture Behavioral of Random_Hex_Generator is
-    signal lfsr : STD_LOGIC_VECTOR(3 downto 0) := "1101"; -- Initial seed
+    signal counter : STD_LOGIC_VECTOR(3 downto 0) := "0000";
+    signal hex_value : STD_LOGIC_VECTOR(3 downto 0) := "0000";
 begin
     process(clk)
     begin
         if rising_edge(clk) then
-            lfsr <= lfsr(2 downto 0) & (lfsr(3) xor lfsr(1)); -- LFSR for pseudo-random generation
+            if counter = "1111" then
+                counter <= "0000";
+            else
+                counter <= std_logic_vector(unsigned(counter) + 1);
+            end if;
+
+            if btn_center = '1' then
+                hex_value <= counter;
+            end if;
         end if;
     end process;
-    
-    rand_hex <= lfsr;
+
+    rand_hex <= hex_value;
 end Behavioral;

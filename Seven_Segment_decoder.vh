@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity Seven_Segment_Decoder is
     Port (
-        hex_in : in STD_LOGIC_VECTOR(3 downto 0);
+        hex_in  : in  STD_LOGIC_VECTOR(3 downto 0);
         seg_out : out STD_LOGIC_VECTOR(6 downto 0)
     );
 end Seven_Segment_Decoder;
@@ -29,7 +29,7 @@ begin
             when "1101" => seg_out <= "0100001"; -- D
             when "1110" => seg_out <= "0000110"; -- E
             when "1111" => seg_out <= "0001110"; -- F
-            when others => seg_out <= "1111111";  -- Default: all segments off
+            when others => seg_out <= "1111111";  -- Apagar todo
         end case;
     end process;
 end Behavioral;
