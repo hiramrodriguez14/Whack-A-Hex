@@ -17,30 +17,37 @@ architecture Behavioral of Timer_Controller is
     signal timer : UNSIGNED(4 downto 0) := "11110"; -- ✅ 30 en binario
 
 begin
-    -- ✅ Manejo del Timer según el Estado del Juego
+    -- ✅ Process for Reset and State Changes
     process(clk100MHz)
     begin
         if rising_edge(clk100MHz) then
             if reset = '1' then
-                timer <= "11110"; -- ✅ Resetear a 30
-
-            elsif state = "011" or state = "101" then  -- ✅ HIGH_SCORE o CURRENT_SCORE
-                if rising_edge(clk1Hz) then
-                    if timer > 0 then
-                        timer <= timer - 1;
-                    end if;
-                end if;
-
-            elsif state = "010" then  -- ✅ PLAY MODE (Usa clkDynamic para velocidad variable)
-                if rising_edge(clkDynamic) then
-                    if timer > 0 then
-                        timer <= timer - 1;
-                    end if;
-                end if;
+                timer <= "11110"; -- ✅ Reset to 30
             end if;
         end if;
     end process;
 
+    -- ✅ Process for HIGH_SCORE and CURRENT_SCORE (Decrements with clk1Hz)
+    process(clk1Hz)
+    begin
+        if rising_edge(clk1Hz) then
+            if (state = "011" or state = "101") and timer > 0 then
+                timer <= timer - 1;
+            end if;
+        end if;
+    end process;
 
+    -- ✅ Process for PLAY MODE (Decrements with clkDynamic)
+    process(clkDynamic)
+    begin
+        if rising_edge(clkDynamic) then
+            if state = "010" and timer > 0 then
+                timer <= timer - 1;
+            end if;
+        end if;
+    end process;
+
+    -- ✅ Assign output
     timer_out <= STD_LOGIC_VECTOR(timer);
+
 end Behavioral;
