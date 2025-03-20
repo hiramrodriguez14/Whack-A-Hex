@@ -7,7 +7,6 @@ entity Clock_Divider_Dynamic is
         clk_100MHz : in  STD_LOGIC;
         reset      : in  STD_LOGIC;
         score      : in  STD_LOGIC_VECTOR(13 downto 0);
-        state      : in  STD_LOGIC_VECTOR(2 downto 0);
         clk_out    : out STD_LOGIC
     );
 end Clock_Divider_Dynamic;
@@ -26,7 +25,7 @@ begin
                 counter <= (others => '0');
                 clk_sig <= '0';
                 divider_value <= to_unsigned(50_000_000, 27);
-            elsif state = "010" then
+            else
                 -- 🔄 Ajuste dinámico basado en el score dentro del proceso secuencial
                 score_int := to_integer(unsigned(score));
                 if score_int < 5 then
