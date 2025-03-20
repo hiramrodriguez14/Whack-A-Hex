@@ -64,7 +64,7 @@ begin
                 case digit_select is
                     when "00" => current_digit <= timer_bcd(7 downto 4); -- Timer Tens
                     when "01" => current_digit <= timer_bcd(3 downto 0); -- Timer Ones
-                    when "10" => current_digit <= lives; -- Display Lives
+                    when "10" => current_digit <=   "00" & lives; -- Display Lives
                     when "11" => current_digit <= random_hex; -- Random Hexadecimal
                     when others => current_digit <= "0000";
                 end case;
