@@ -20,10 +20,10 @@ begin
             -- Desplazar valores en el registro
             shift_reg <= shift_reg(17 downto 0) & btn_in;
 
-            -- Si todos los bits son 1s → Botón presionado
+            -- Si todos los bits son 1s ? Botón presionado
             if shift_reg = "1111111111111111111" then
                 btn_out_reg <= '1';
-            -- Si todos los bits son 0s → Botón liberado
+            -- Si todos los bits son 0s ? Botón liberado
             elsif shift_reg = "0000000000000000000" then
                 btn_out_reg <= '0';
             end if;
