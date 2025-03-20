@@ -6,7 +6,7 @@ entity Score_Storage is
     Port (
         clk         : in STD_LOGIC;  -- Señal de reloj
         reset       : in STD_LOGIC;  -- Resetea el puntaje actual
-        state      : in STD_LOGIC_VECTOR(2 downto 0);  -- Estado del juego
+        state       : in STD_LOGIC_VECTOR(2 downto 0);  -- Estado del juego
         increment   : in STD_LOGIC;  -- Aumenta el puntaje
         current_score : out STD_LOGIC_VECTOR(13 downto 0); -- Puntaje actual (máx. 9999)
         high_score : out STD_LOGIC_VECTOR(13 downto 0) -- Puntaje más alto (máx. 9999)
@@ -24,9 +24,11 @@ begin
             if reset = '1' then
                 -- Reinicia el puntaje
                 score <= (others => '0');
-            elsif increment = '1' then
-                if score < 9999 then  -- Evita que el puntaje suba de 9999
-                    score <= score + 1;
+            elsif state = "010" then -- ✅ Only allow score increment in state = "010"
+                if increment = '1' then
+                    if score < 9999 then  -- Evita que el puntaje suba de 9999
+                        score <= score + 1;
+                    end if;
                 end if;
             end if;
 
