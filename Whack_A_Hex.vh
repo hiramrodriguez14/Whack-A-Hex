@@ -107,4 +107,11 @@ begin
         an => an
     );
 
+    -- Random Hex Generator
+    RandomGen : entity work.Random_Hex_Generator port map (
+        clk       => clk_100MHz,
+        btn_center => btn_center_clean,
+        rand_hex  => rand_hex
+    );
+    
 end Structural;
