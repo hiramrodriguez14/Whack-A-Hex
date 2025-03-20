@@ -26,19 +26,20 @@ architecture Behavioral of FSM_Controller is
     signal lives_reg : STD_LOGIC_VECTOR(1 downto 0) := "11";
     signal reset_sig : STD_LOGIC := '0';
     signal increment_sig : STD_LOGIC := '0';
+    signal reset_dynamic_sig : STD_LOGIC := '0';
 
 begin
     process(clk)
     begin
         if rising_edge(clk) then
             increment_sig <= '0';
+            reset_sig <= '0'; 
+            reset_dynamic_sig <= '0'; 
 
             if state = "000" then
-                state <= "001";
-                lives_reg <= "11";
+                lives_reg <= "11"; 
                 reset_sig <= '1';
-            else
-                reset_sig <= '0';
+                state <= "001"; 
             end if;
 
             if btn_center = '1' and state = "001" then
@@ -47,7 +48,7 @@ begin
             elsif btn_down = '1' and state = "001" then
                 state <= "011";
 
-            elsif btn_down = '1' and state = "010" then
+            elsif btn_up = '1' and state = "010" then
                 state <= "100";
 
             elsif btn_up = '1' and state = "100" then
@@ -60,12 +61,12 @@ begin
                 if btn_center = '1' then
                     if pos_out = random_hex then
                         increment_sig <= '1';
-                        reset_dynamic <= '1';
+                        reset_dynamic_sig <= '1';
                     else
                         if lives_reg > "00" then
                             lives_reg <= std_logic_vector(unsigned(lives_reg) - 1);
                         end if;
-                        reset_dynamic <= '1';
+                        reset_dynamic_sig <= '1';
                     end if;
                 end if;
 
@@ -73,7 +74,7 @@ begin
                     if lives_reg > "00" then
                         lives_reg <= std_logic_vector(unsigned(lives_reg) - 1);
                     end if;
-                    reset_dynamic <= '1';
+                    reset_dynamic_sig <= '1';
                 end if;
 
                 if lives_reg = "00" then
@@ -96,6 +97,7 @@ begin
     state_out <= state;
     reset_out <= reset_sig;
     increment <= increment_sig;
+    reset_dynamic <= reset_dynamic_sig;
     lives <= lives_reg;
 
 end Behavioral;
